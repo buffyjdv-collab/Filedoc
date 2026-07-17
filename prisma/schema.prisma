@@ -1,16 +1,14 @@
 // Filedoc - Document & File Management System
 // Powered by NeonDB (Serverless PostgreSQL) + Vercel
-//
-// For local development: uses SQLite
-// For production (NeonDB): switch provider to "postgresql" and set DATABASE_URL + DIRECT_URL
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {

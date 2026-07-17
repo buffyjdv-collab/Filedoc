@@ -1,18 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "buildCommand": "bun run build",
-  "installCommand": "bun install",
-  "devCommand": "bun run dev",
+  "buildCommand": "prisma generate && next build",
+  "installCommand": "npm install",
   "regions": ["iad1"],
   "env": {
     "DATABASE_URL": {
-      "description": "NeonDB connection pool URL (e.g., postgres://user:pass@ep-xxx.us-east-2.aws.neon.tech/filedoc?sslmode=require)",
-      "value": ""
+      "description": "NeonDB pooled connection URL — e.g. postgres://user:pass@ep-xxx.us-east-2.aws.neon.tech/filedoc?sslmode=require"
     },
     "DIRECT_URL": {
-      "description": "NeonDB direct connection URL for migrations (e.g., postgres://user:pass@ep-xxx.us-east-2.aws.neon.tech/filedoc?sslmode=require)",
-      "value": ""
+      "description": "NeonDB direct connection URL for migrations — e.g. postgres://user:pass@ep-xxx.us-east-2.aws.neon.tech/filedoc?sslmode=require"
     }
   }
 }

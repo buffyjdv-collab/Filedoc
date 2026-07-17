@@ -19,9 +19,9 @@ export async function GET(request: Request) {
     if (isStarred === 'true') where.isStarred = true
     if (search) {
       where.OR = [
-        { title: { contains: search } },
-        { content: { contains: search } },
-        { tags: { contains: search } },
+        { title: { contains: search, mode: 'insensitive' } },
+        { content: { contains: search, mode: 'insensitive' } },
+        { tags: { contains: search, mode: 'insensitive' } },
       ]
     }
 
