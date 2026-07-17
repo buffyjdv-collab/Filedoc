@@ -1,0 +1,110 @@
+// Filedoc - Document & File Management System
+// PRODUCTION SCHEMA: NeonDB (Serverless PostgreSQL) + Vercel
+//
+// Use this schema when deploying to production with NeonDB.
+// Replace the local schema.prisma with this content and set:
+//   DATABASE_URL=postgres://user:pass@ep-xxx.neon.tech/filedoc?sslmode=require
+//   DIRECT_URL=postgres://user:pass@ep-xxx.neon.tech/filedoc?sslmode=require
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  folders    Folder[]
+  documents  Document[]
+  sharedWith SharedDocument[]
+}
+
+model Folder {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String   @default("#6366f1")
+  icon        String   @default("folder")
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parentId String?
+  parent   Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children Folder[] @relation("FolderHierarchy")
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents Document[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  title       String
+  content     String?
+  type        String   @default("NOTE")
+  status      String   @default("DRAFT")
+  tags        String?
+  isStarred   Boolean  @default(false)
+  isArchived  Boolean  @default(false)
+  version     Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  folderId String?
+  folder   Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  userId String
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sharedWith  SharedDocument[]
+  attachments Attachment[]
+  versions    DocumentVersion[]
+}
+
+model DocumentVersion {
+  id        String   @id @default(cuid())
+  content   String?
+  version   Int
+  createdAt DateTime @default(now())
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model SharedDocument {
+  id         String   @id @default(cuid())
+  permission String   @default("VIEW")
+  createdAt  DateTime @default(now())
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+}
+
+model Attachment {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
